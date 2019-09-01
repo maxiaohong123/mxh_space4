@@ -449,7 +449,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void doExportUrls() {
-        List<URL> registryURLs = loadRegistries(true); //mxh5:加载配置文件中的信息，组成简单的url
+        List<URL> registryURLs = loadRegistries(true); //mxh5:加载配置文件中的信息，生成url,如：    registry://127.0.0.1:2181/com.mxh.dubbo.IOrderService.
         for (ProtocolConfig protocolConfig : protocols) {
             String pathKey = URL.buildKey(getContextPath(protocolConfig).map(p -> p + "/" + path).orElse(path), group, version);
             ProviderModel providerModel = new ProviderModel(pathKey, ref, interfaceClass);
@@ -567,11 +567,16 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                     .getExtension(url.getProtocol()).getConfigurator(url).configure(url);
         }
 
+         //dubbo可以通过scope来选择服务发布的范围，有2种：remote 和local
+         // local: 指同一个jvm里面调用，没必要走远程
+        //  remote: 指走远程调用，如:  url = dubbo://xxxx.xxxx.xxx.xxx/com.mxh.dubbo.IOrderService
+        // 默认情况下：如果配置了dubbo.registry.address=zookeeper://10.0.0.102:2181?backup=10.0.0.101:2181,10.0.0.103:2181 ，则默认会发布2种服务，即：本地服务和远程服务
         String scope = url.getParameter(SCOPE_KEY);
         // don't export when none is configured
         if (!SCOPE_NONE.equalsIgnoreCase(scope)) {
 
             // export to local if the config is not remote (export to remote only when config is remote)
+            //如果是本地服务发布，则不需要启动netty服务
             if (!SCOPE_REMOTE.equalsIgnoreCase(scope)) {
                 exportLocal(url);
             }
@@ -601,6 +606,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                             registryURL = registryURL.addParameter(PROXY_KEY, proxy);
                         }
 
+                        //TODO   invoker是一个代理类
                         Invoker<?> invoker = proxyFactory.getInvoker(ref, (Class) interfaceClass, registryURL.addParameterAndEncoded(EXPORT_KEY, url.toFullString()));  //将以上的url组成一个Invoker
                         DelegateProviderMetaDataInvoker wrapperInvoker = new DelegateProviderMetaDataInvoker(invoker, this);  //对原始的Invoker进行包装，增强方法的使用
 

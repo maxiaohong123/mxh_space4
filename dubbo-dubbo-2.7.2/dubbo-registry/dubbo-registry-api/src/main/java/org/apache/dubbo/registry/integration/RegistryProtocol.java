@@ -190,6 +190,7 @@ public class RegistryProtocol implements Protocol {
         registry.unregister(registeredProviderUrl);
     }
 
+    //实现服务的发布与注册
     @Override
     public <T> Exporter<T> export(final Invoker<T> originInvoker) throws RpcException {
         URL registryUrl = getRegistryUrl(originInvoker);//得到一个zookeeper://xxx.xxx.xxx.xxx/com.dubbo.mxh.IOrderService?xxx=xxx
@@ -242,6 +243,8 @@ public class RegistryProtocol implements Protocol {
 
         return (ExporterChangeableWrapper<T>) bounds.computeIfAbsent(key, s -> {
             Invoker<?> invokerDelegate = new InvokerDelegate<>(originInvoker, providerUrl);
+            //protocol = DubboProtocol#export  本质上就是暴露一个20880的端口。
+            // 此处的protocol是通过set方法进行注入的，默认是一个DubboProtocol。
             return new ExporterChangeableWrapper<>((Exporter<T>) protocol.export(invokerDelegate), originInvoker);
         });
     }
