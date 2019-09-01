@@ -44,6 +44,7 @@ public class DubboNamespaceHandler extends NamespaceHandlerSupport {
         Version.checkDuplicate(DubboNamespaceHandler.class);
     }
 
+    //1、解析dubbo配置文件的入口
     @Override
     public void init() {
         registerBeanDefinitionParser("application", new DubboBeanDefinitionParser(ApplicationConfig.class, true));
@@ -60,5 +61,6 @@ public class DubboNamespaceHandler extends NamespaceHandlerSupport {
         registerBeanDefinitionParser("reference", new DubboBeanDefinitionParser(ReferenceBean.class, false));
         registerBeanDefinitionParser("annotation", new AnnotationBeanDefinitionParser());
     }
+    //注意：以上代码其它都是xxxConfig.class，只有ServiceBean和ReferenceBean是Bean,是因为它俩相比其它类，需要扩展更多的信息。
 
 }

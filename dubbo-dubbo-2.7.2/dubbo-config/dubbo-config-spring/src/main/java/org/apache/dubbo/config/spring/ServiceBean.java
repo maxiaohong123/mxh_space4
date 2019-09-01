@@ -111,7 +111,7 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
             if (logger.isInfoEnabled()) {
                 logger.info("The service ready on spring started. service: " + getInterface());
             }
-            export();
+            export();  //mxh1:服务发布的入口
         }
     }
 
@@ -333,7 +333,7 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
      */
     @Override
     public void export() {
-        super.export();
+        super.export(); //mxh2:服务发布的入口，真正调 用父类的export方法。
         // Publish ServiceBeanExportedEvent
         publishExportEvent();
     }
