@@ -207,9 +207,11 @@ public class RegistryProtocol implements Protocol {
 
         providerUrl = overrideUrlWithConfig(providerUrl, overrideSubscribeListener);
         //export invoker
+        // 真正发布一个invoker
         final ExporterChangeableWrapper<T> exporter = doLocalExport(originInvoker, providerUrl);
 
         // url to registry
+        //向zk上注册一个服务
         final Registry registry = getRegistry(originInvoker);
         final URL registeredProviderUrl = getRegisteredProviderUrl(providerUrl, registryUrl);
         ProviderInvokerWrapper<T> providerInvokerWrapper = ProviderConsumerRegTable.registerProvider(originInvoker,
@@ -245,6 +247,7 @@ public class RegistryProtocol implements Protocol {
             Invoker<?> invokerDelegate = new InvokerDelegate<>(originInvoker, providerUrl);
             //protocol = DubboProtocol#export  本质上就是暴露一个20880的端口。
             // 此处的protocol是通过set方法进行注入的，默认是一个DubboProtocol。
+            //TODO 研究一个为什么是DubboProtocol
             return new ExporterChangeableWrapper<>((Exporter<T>) protocol.export(invokerDelegate), originInvoker);
         });
     }

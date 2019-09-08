@@ -607,6 +607,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                         }
 
                         //TODO   invoker是一个代理类
+                        //invoker= ListenerExporterWrapper(ProtocolFilterWrapper(JavassistProxyFactory))  此处的invoker是通过javaassist动态代理生成一个代理类，此代理类实际上是接口的实现类，而不是通过反射而调用。
                         Invoker<?> invoker = proxyFactory.getInvoker(ref, (Class) interfaceClass, registryURL.addParameterAndEncoded(EXPORT_KEY, url.toFullString()));  //将以上的url组成一个Invoker
                         DelegateProviderMetaDataInvoker wrapperInvoker = new DelegateProviderMetaDataInvoker(invoker, this);  //对原始的Invoker进行包装，增强方法的使用
 
