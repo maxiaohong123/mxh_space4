@@ -163,6 +163,7 @@ public class ZookeeperRegistry extends FailbackRegistry {
                 }
             } else {
                 List<URL> urls = new ArrayList<>();
+                //此处的循环是指的消费端的configurator、consumer、router
                 for (String path : toCategoriesPath(url)) {
                     ConcurrentMap<NotifyListener, ChildListener> listeners = zkListeners.get(url);
                     if (listeners == null) {
@@ -174,8 +175,8 @@ public class ZookeeperRegistry extends FailbackRegistry {
                         listeners.putIfAbsent(listener, (parentPath, currentChilds) -> ZookeeperRegistry.this.notify(url, listener, toUrlsWithEmpty(url, parentPath, currentChilds)));
                         zkListener = listeners.get(listener);
                     }
-                    zkClient.create(path, false);
-                    List<String> children = zkClient.addChildListener(path, zkListener);
+                    zkClient.create(path, false); //创建消费端的子节点
+                    List<String> children = zkClient.addChildListener(path, zkListener);//创建监听
                     if (children != null) {
                         urls.addAll(toUrlsWithEmpty(url, path, children));
                     }

@@ -169,6 +169,7 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
         setConsumerUrl(url);
         CONSUMER_CONFIGURATION_LISTENER.addNotifyListener(this);
         serviceConfigurationListener = new ReferenceConfigurationListener(this, url);
+        // this = RegistryDirectory
         registry.subscribe(url, this);
     }
 
@@ -230,13 +231,13 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
 
         // providers
         List<URL> providerURLs = categoryUrls.getOrDefault(PROVIDERS_CATEGORY, Collections.emptyList());
-        refreshOverrideAndInvoker(providerURLs);
+        refreshOverrideAndInvoker(providerURLs);  //
     }
 
     private void refreshOverrideAndInvoker(List<URL> urls) {
         // mock zookeeper://xxx?mock=return null
         overrideDirectoryUrl();
-        refreshInvoker(urls);
+        refreshInvoker(urls);  //zk监听到consumer、router、configurators有变化时，刷新directory
     }
 
     /**
