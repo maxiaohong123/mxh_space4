@@ -241,10 +241,12 @@ public abstract class AbstractClusterInvoker<T> implements Invoker<T> {
         if (contextAttachments != null && contextAttachments.size() != 0) {
             ((RpcInvocation) invocation).addAttachments(contextAttachments);
         }
-
+        //从RegistryDirectory中获取所有注册的url;然后根据配置的负载均衡算法得到其中一个Invoker；最后发起远程调用。
         List<Invoker<T>> invokers = list(invocation);
+        //根据invokers和invocation（method,args）得到一个具体的LoadBanlance
         LoadBalance loadbalance = initLoadBalance(invokers, invocation);
         RpcUtils.attachInvocationIdIfAsync(getUrl(), invocation);
+        //根据invocation\invokers\loadbalance执行调用，根据调用链，应该调用FailoverClusterInvoker
         return doInvoke(invocation, invokers, loadbalance);
     }
 
